@@ -34,7 +34,18 @@ export default function DashboardPage() {
     setLoading(true)
     try {
       // Start interview
-      const interviewResponse = await userService.startInterview(selectedType, selectedDifficulty)
+      let interviewResponse
+      try {
+        interviewResponse = await userService.startInterview(selectedType, selectedDifficulty)
+      } catch (err) {
+        // If 401, try once more after re-reading token (fixes a possible race where token was just written)
+        if (err.response?.status === 401) {
+          await new Promise((r) => setTimeout(r, 200))
+          interviewResponse = await userService.startInterview(selectedType, selectedDifficulty)
+        } else {
+          throw err
+        }
+      }
       const interviewId = interviewResponse.data.interview_id
 
       // Get questions

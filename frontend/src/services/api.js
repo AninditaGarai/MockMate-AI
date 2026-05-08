@@ -61,8 +61,11 @@ export const feedbackService = {
 }
 
 export const userService = {
-  startInterview: (interviewType, difficulty) =>
-    apiClient.post('/users/start-interview', { interview_type: interviewType, difficulty }),
+  startInterview: (interviewType, difficulty) => {
+    const token = localStorage.getItem('access_token')
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+    return apiClient.post('/users/start-interview', { interview_type: interviewType, difficulty }, { headers })
+  },
   
   endInterview: (interviewId) =>
     apiClient.post(`/users/end-interview/${interviewId}`),
