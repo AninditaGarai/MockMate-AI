@@ -55,8 +55,9 @@ export default function DashboardPage() {
 
       navigate(`/interview/${interviewId}`)
     } catch (error) {
-      console.error('Failed to start interview:', error)
-      alert('Failed to start interview. Please try again.')
+      console.error('Failed to start interview:', error, error.response?.data)
+      const msg = error.response?.data?.detail || error.response?.data || error.message || 'Failed to start interview. Please try again.'
+      alert(msg)
     } finally {
       setLoading(false)
     }
