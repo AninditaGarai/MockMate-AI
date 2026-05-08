@@ -228,3 +228,88 @@ Make questions realistic, thought-provoking, and appropriate for the difficulty 
             })
         
         return questions
+
+
+def get_fallback_questions(category: str, difficulty: str, count: int = 1) -> List[Dict]:
+    """Module-level fallback function so callers don't need to instantiate the class.
+
+    This avoids instantiating the OpenAI client when the installed SDK is incompatible.
+    """
+    fallback_db = {
+        "SDE": {
+            "easy": [
+                "Explain the difference between arrays and linked lists.",
+                "What is a time complexity analysis?",
+                "How do you reverse a string?",
+                "Explain what a hash map is.",
+                "What are the SOLID principles?"
+            ],
+            "medium": [
+                "Implement a binary search tree.",
+                "How would you detect a cycle in a linked list?",
+                "Explain the concept of inheritance in OOP.",
+                "What is the difference between synchronous and asynchronous programming?",
+                "How do databases use indexing?"
+            ],
+            "hard": [
+                "Design a distributed caching system.",
+                "Explain how microservices architecture differs from monolithic.",
+                "How would you optimize a slow database query?",
+                "Design a URL shortening service.",
+                "How do you handle data consistency in distributed systems?"
+            ]
+        },
+        "AI/ML": {
+            "easy": [
+                "What is machine learning?",
+                "Explain supervised vs unsupervised learning.",
+                "What is a neural network?",
+                "Explain what a dataset is.",
+                "What is feature normalization?"
+            ],
+            "medium": [
+                "Explain the concept of overfitting.",
+                "How do you handle missing data in a dataset?",
+                "What is cross-validation?",
+                "Explain the backpropagation algorithm.",
+                "What are activation functions?"
+            ],
+            "hard": [
+                "Design a recommendation system.",
+                "Explain attention mechanisms in transformers.",
+                "How do you handle imbalanced datasets?",
+                "Design a natural language processing pipeline.",
+                "Explain generative adversarial networks."
+            ]
+        },
+        "HR": {
+            "easy": [
+                "Tell me about yourself.",
+                "Why do you want to work with us?",
+                "What are your strengths?",
+                "What are your weaknesses?",
+                "Where do you see yourself in 5 years?"
+            ],
+            "medium": [
+                "Tell me about a time you faced a challenge.",
+                "Describe a situation where you led a team.",
+                "How do you handle conflict with colleagues?",
+                "What's your approach to problem-solving?",
+                "Can you give an example of a time you failed?"
+            ],
+            "hard": [
+                "Tell me about your most complex project.",
+                "How have you handled a difficult stakeholder?",
+                "Describe your experience managing technical teams.",
+                "What's your approach to mentoring junior developers?",
+                "Tell me about a time you had to make a tough decision."
+            ]
+        }
+    }
+
+    questions_list = fallback_db.get(category, {}).get(difficulty, [])
+    questions = []
+    for i, q in enumerate(questions_list[:count]):
+        questions.append({"text": q, "tags": f"{category},{difficulty}"})
+
+    return questions
