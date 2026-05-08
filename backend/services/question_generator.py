@@ -1,13 +1,37 @@
 import os
-from openai import OpenAI
 from typing import List, Dict
+
+try:
+    # Newer OpenAI SDK exposes OpenAI; older versions may differ.
+    from openai import OpenAI
+    _HAS_OPENAI = True
+except Exception:
+    OpenAI = None
+    _HAS_OPENAI = False
+
 
 class QuestionGenerator:
     """Generate interview questions using OpenAI API"""
     
     def __init__(self):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = "gpt-4"
+        self.client = None
+
+        # Only create a client if the SDK is available and an API key is set.
+        api_key = os.getenv("OPENAI_API_KEY")
+        if _HAS_OPENAI and api_key:
+            try:
+                # Instantiate the client defensively; some installed versions
+                # of the OpenAI package may not accept certain kwargs.
+                self.client = OpenAI(api_key=api_key)
+            except TypeError:
+                # Fallback: try without keyword args
+                try:
+                    self.client = OpenAI(api_key)
+                except Exception:
+                    self.client = None
+            except Exception:
+                self.client = None
     
     def generate_questions(
         self,
@@ -19,27 +43,44 @@ class QuestionGenerator:
         
         prompt = self._build_prompt(category, difficulty, count)
         
+        # If we don't have a working OpenAI client, use fallbacks immediately.
+        if not self.client:
+            return self._get_fallback_questions(category, difficulty, count)
+
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an expert interview question generator. Generate realistic, challenging interview questions."
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                temperature=0.7,
-                max_tokens=1500
-            )
-            
+            # The OpenAI SDK surface can vary; attempt a few reasonable call patterns.
+            # Preferred: new-style `client.chat.completions.create`
+            if hasattr(self.client, "chat") and hasattr(self.client.chat, "completions"):
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are an expert interview question generator. Generate realistic, challenging interview questions."
+                        },
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ],
+                    temperature=0.7,
+                    max_tokens=1500
+                )
+                raw_text = getattr(response.choices[0].message, "content", None) or getattr(response.choices[0], "text", "")
+            else:
+                # Try older OpenAI client pattern
+                response = self.client.Completion.create(
+                    engine=self.model,
+                    prompt=prompt,
+                    max_tokens=1500,
+                    temperature=0.7
+                )
+                raw_text = response.choices[0].text
+
             # Parse the response
-            questions = self._parse_response(response.choices[0].message.content)
+            questions = self._parse_response(raw_text)
             return questions
-        
+
         except Exception as e:
             print(f"Error generating questions: {e}")
             return self._get_fallback_questions(category, difficulty, count)
