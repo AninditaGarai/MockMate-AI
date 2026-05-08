@@ -65,12 +65,9 @@ export default function InterviewPage() {
       console.warn('TTS not available:', err)
     }
 
-    // Auto-start recording shortly after speaking (if not already recording)
-    const t = setTimeout(() => {
-      if (!isRecording) startRecording()
-    }, 1200)
-
-    return () => clearTimeout(t)
+    // Removed auto-start recording to avoid unexpected permission prompts.
+    // User must press the Record button to start recording now.
+    return () => {}
   }, [currentQuestionIndex, questions])
 
   if (questions.length === 0) {

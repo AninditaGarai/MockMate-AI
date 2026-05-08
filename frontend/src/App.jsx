@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage'
 import InterviewPage from './pages/InterviewPage'
 import DashboardPage from './pages/DashboardPage'
 import ResultsPage from './pages/ResultsPage'
+import DevMicPage from './pages/DevMicPage'
 import { useAuthStore } from './store'
 import './App.css'
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/dashboard" element={token ? <DashboardPage /> : <Navigate to="/login" />} />
           <Route path="/interview/:id" element={token ? <InterviewPage /> : <Navigate to="/login" />} />
           <Route path="/results/:id" element={token ? <ResultsPage /> : <Navigate to="/login" />} />
+          <Route path="/dev/mic" element={<DevMicPage />} />
         </Routes>
       </Layout>
     </Router>
