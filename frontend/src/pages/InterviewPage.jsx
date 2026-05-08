@@ -15,6 +15,7 @@ export default function InterviewPage() {
     scores,
     addAnswer,
     addScore,
+    setQuestions,
     setCurrentQuestion,
     endInterview: endInterviewStore,
   } = useInterviewStore()
@@ -28,6 +29,20 @@ export default function InterviewPage() {
 
   useEffect(() => {
     if (questions.length === 0) {
+      // If dev questions are present in localStorage, use them for testing.
+      try {
+        const dev = localStorage.getItem('dev_questions')
+        if (dev) {
+          const parsed = JSON.parse(dev)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setQuestions(parsed)
+            return
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+
       navigate('/dashboard')
     }
   }, [questions, navigate])
