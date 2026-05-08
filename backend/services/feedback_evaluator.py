@@ -1,13 +1,31 @@
 import os
-from openai import OpenAI
 import re
+
+try:
+    from openai import OpenAI
+    _HAS_OPENAI = True
+except Exception:
+    OpenAI = None
+    _HAS_OPENAI = False
+
 
 class FeedbackEvaluator:
     """Evaluate answers using OpenAI API"""
-    
+
     def __init__(self):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = "gpt-4"
+        self.client = None
+        api_key = os.getenv("OPENAI_API_KEY")
+        if _HAS_OPENAI and api_key:
+            try:
+                self.client = OpenAI(api_key=api_key)
+            except TypeError:
+                try:
+                    self.client = OpenAI(api_key)
+                except Exception:
+                    self.client = None
+            except Exception:
+                self.client = None
     
     def evaluate(self, question: str, answer: str) -> dict:
         """Evaluate an answer against a question"""
