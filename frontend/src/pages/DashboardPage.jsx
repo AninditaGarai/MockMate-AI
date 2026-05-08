@@ -38,7 +38,7 @@ export default function DashboardPage() {
       const interviewId = interviewResponse.data.interview_id
 
       // Get questions
-      const questionsResponse = await questionService.getQuestions(selectedType, selectedDifficulty)
+      let questionsResponse = await questionService.getQuestions(selectedType, selectedDifficulty)
       const startInterview = useInterviewStore.getState().startInterview
       const setQuestions = useInterviewStore.getState().setQuestions
 
@@ -48,6 +48,20 @@ export default function DashboardPage() {
         questionsArray = questionsResponse.data
       } else if (questionsResponse.data && Array.isArray(questionsResponse.data.questions)) {
         questionsArray = questionsResponse.data.questions
+      }
+
+      // If no questions in DB, generate some using the AI endpoint
+      if (questionsArray.length === 0) {
+        try {
+          const genResp = await questionService.generateQuestions(selectedType, selectedDifficulty, 5)
+          if (Array.isArray(genResp.data)) {
+            questionsArray = genResp.data
+          } else if (genResp.data && Array.isArray(genResp.data.questions)) {
+            questionsArray = genResp.data.questions
+          }
+        } catch (genErr) {
+          console.error('Failed to generate questions:', genErr)
+        }
       }
 
       startInterview(interviewResponse.data)
