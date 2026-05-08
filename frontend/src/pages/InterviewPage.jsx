@@ -32,6 +32,32 @@ export default function InterviewPage() {
     }
   }, [questions, navigate])
 
+  // Speak the question aloud and optionally auto-start recording
+  useEffect(() => {
+    if (questions.length === 0) return
+    const current = questions[currentQuestionIndex]
+    if (!current) return
+
+    // Text-to-Speech
+    try {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+        const utter = new SpeechSynthesisUtterance(current.text)
+        utter.lang = 'en-US'
+        window.speechSynthesis.speak(utter)
+      }
+    } catch (err) {
+      console.warn('TTS not available:', err)
+    }
+
+    // Auto-start recording shortly after speaking (if not already recording)
+    const t = setTimeout(() => {
+      if (!isRecording) startRecording()
+    }, 1200)
+
+    return () => clearTimeout(t)
+  }, [currentQuestionIndex, questions])
+
   if (questions.length === 0) {
     return <div className="text-center py-8">Loading...</div>
   }

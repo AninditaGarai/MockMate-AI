@@ -42,8 +42,16 @@ export default function DashboardPage() {
       const startInterview = useInterviewStore.getState().startInterview
       const setQuestions = useInterviewStore.getState().setQuestions
 
+      // Normalize response to an array (API may return { questions: [...] } or an array)
+      let questionsArray = []
+      if (Array.isArray(questionsResponse.data)) {
+        questionsArray = questionsResponse.data
+      } else if (questionsResponse.data && Array.isArray(questionsResponse.data.questions)) {
+        questionsArray = questionsResponse.data.questions
+      }
+
       startInterview(interviewResponse.data)
-      setQuestions(questionsResponse.data)
+      setQuestions(questionsArray)
 
       navigate(`/interview/${interviewId}`)
     } catch (error) {
