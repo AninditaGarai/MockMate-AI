@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import get_db
 import models
-from services.question_generator import QuestionGenerator, get_fallback_questions
+# Importing the generator lazily inside the endpoint to avoid import-time issues
 from typing import List
 
 router = APIRouter()
@@ -30,16 +30,26 @@ async def generate_questions(
 ):
     """Generate interview questions using AI"""
     try:
-        # Try to instantiate generator; if it fails, fall back without raising.
+        # Import lazily to avoid side-effects from problematic OpenAI SDKs at module import time
         try:
-            generator = QuestionGenerator()
-            questions = generator.generate_questions(
-                category=request.category,
-                difficulty=request.difficulty,
-                count=request.count
-            )
+            from services.question_generator import QuestionGenerator, get_fallback_questions
         except Exception:
-            questions = get_fallback_questions(request.category, request.difficulty, request.count)
+            QuestionGenerator = None
+            get_fallback_questions = None
+
+        # Try to instantiate generator; if it fails, fall back without raising.
+        if QuestionGenerator:
+            try:
+                generator = QuestionGenerator()
+                questions = generator.generate_questions(
+                    category=request.category,
+                    difficulty=request.difficulty,
+                    count=request.count
+                )
+            except Exception:
+                questions = get_fallback_questions(request.category, request.difficulty, request.count) if get_fallback_questions else []
+        else:
+            questions = get_fallback_questions(request.category, request.difficulty, request.count) if get_fallback_questions else []
 
         # Save to database
         db_questions = []
