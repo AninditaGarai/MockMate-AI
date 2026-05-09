@@ -1,38 +1,38 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiPlay, FiTrendingUp } from 'react-icons/fi'
+import { FiPlay, FiMic, FiBarChart2, FiCpu, FiGlobe, FiSettings } from 'react-icons/fi'
 
 export default function HomePage() {
   const isAuthenticated = !!localStorage.getItem('access_token')
 
   const features = [
     {
-      icon: '🤖',
+      icon: FiCpu,
       title: 'AI-Powered Questions',
       description: 'Dynamic questions generated across SDE, AI/ML, and HR domains'
     },
     {
-      icon: '🎤',
+      icon: FiMic,
       title: 'Multi-Modal Input',
       description: 'Answer questions via text or voice to simulate real interviews'
     },
     {
-      icon: '📊',
+      icon: FiBarChart2,
       title: 'Intelligent Feedback',
       description: 'Get detailed feedback on confidence, grammar, and technical accuracy'
     },
     {
-      icon: '📈',
+      icon: FiTrendingUp,
       title: 'Performance Tracking',
       description: 'Track your progress and identify areas for improvement'
     },
     {
-      icon: '⚙️',
+      icon: FiSettings,
       title: 'Hybrid AI + ML',
       description: 'OpenAI API with local ML model fallback for reliability'
     },
     {
-      icon: '🌐',
+      icon: FiGlobe,
       title: 'Responsive UI',
       description: 'Clean, intuitive interface built with React and Tailwind CSS'
     }
@@ -73,8 +73,13 @@ export default function HomePage() {
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Key Features</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <div key={index} className="p-6 rounded-lg bg-gray-50 hover:shadow-lg transition-shadow">
-              <div className="text-4xl mb-4">{feature.icon}</div>
+            <div
+              key={index}
+              className="p-6 rounded-lg bg-gray-50 border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+            >
+              <div className="text-3xl mb-4 text-purple-600">
+                <feature.icon />
+              </div>
               <h3 className="text-xl font-bold mb-2 text-gray-800">{feature.title}</h3>
               <p className="text-gray-600">{feature.description}</p>
             </div>
