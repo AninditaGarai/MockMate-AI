@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FiPlay } from 'react-icons/fi'
+import { FiPlay, FiChevronDown, FiLoader } from 'react-icons/fi'
 import { userService, questionService } from '../services/api'
 import { useInterviewStore } from '../store'
 
@@ -97,39 +97,46 @@ export default function DashboardPage() {
         <div className="grid md:grid-cols-3 gap-6">
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Interview Type</label>
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
-            >
-              {interviewTypes.map((type) => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="w-full appearance-none px-4 py-3 pr-10 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+              >
+                {interviewTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+              <FiChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            </div>
           </div>
 
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Difficulty</label>
-            <select
-              value={selectedDifficulty}
-              onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
-            >
-              {difficulties.map((diff) => (
-                <option key={diff} value={diff}>
-                  {diff.charAt(0).toUpperCase() + diff.slice(1)}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={selectedDifficulty}
+                onChange={(e) => setSelectedDifficulty(e.target.value)}
+                className="w-full appearance-none px-4 py-3 pr-10 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+              >
+                {difficulties.map((diff) => (
+                  <option key={diff} value={diff}>
+                    {diff.charAt(0).toUpperCase() + diff.slice(1)}
+                  </option>
+                ))}
+              </select>
+              <FiChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            </div>
           </div>
 
           <div className="flex items-end">
             <button
               onClick={handleStartInterview}
               disabled={loading}
-              className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 font-semibold flex items-center justify-center gap-2"
+              className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 font-semibold flex items-center justify-center gap-2 transition-colors"
             >
-              <FiPlay /> {loading ? 'Starting...' : 'Start Interview'}
+              {loading ? <FiLoader className="animate-spin" /> : <FiPlay />}
+              {loading ? 'Starting...' : 'Start Interview'}
             </button>
           </div>
         </div>
