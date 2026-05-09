@@ -8,8 +8,11 @@ export default function ResultsPage() {
   const [feedback, setFeedback] = useState([])
   const [loading, setLoading] = useState(true)
   const [chartData, setChartData] = useState([])
+  const [error, setError] = useState('')
 
   useEffect(() => {
+    setLoading(true)
+    setError('')
     loadFeedback()
   }, [id])
 
@@ -29,6 +32,7 @@ export default function ResultsPage() {
       setChartData(data)
     } catch (error) {
       console.error('Error loading feedback:', error)
+      setError('We could not load the interview results right now.')
     } finally {
       setLoading(false)
     }
@@ -36,6 +40,15 @@ export default function ResultsPage() {
 
   if (loading) {
     return <div className="text-center py-8">Loading results...</div>
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl shadow-xl p-8 text-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">Results unavailable</h2>
+        <p className="text-gray-600">{error}</p>
+      </div>
+    )
   }
 
   const averageScores = {
@@ -70,7 +83,7 @@ export default function ResultsPage() {
       {/* Chart */}
       <div className="bg-white rounded-xl shadow-xl p-8">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Performance Trend</h2>
-        {chartData.length > 0 && (
+        {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -84,8 +97,16 @@ export default function ResultsPage() {
               <Line type="monotone" dataKey="overall" stroke="#f43f5e" />
             </LineChart>
           </ResponsiveContainer>
+        ) : (
+          <p className="text-gray-600">No scored answers are available for this interview yet.</p>
         )}
       </div>
+
+      {feedback.length === 0 && (
+        <div className="bg-white rounded-xl shadow-xl p-8 text-center text-gray-600">
+          No interview feedback has been saved for this session yet.
+        </div>
+      )}
 
       {/* Detailed Feedback */}
       <div className="bg-white rounded-xl shadow-xl p-8">

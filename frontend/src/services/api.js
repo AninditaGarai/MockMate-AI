@@ -1,6 +1,12 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+const rawBaseUrl = import.meta.env.VITE_API_URL || '/api'
+const API_BASE_URL = rawBaseUrl.endsWith('/') ? rawBaseUrl.slice(0, -1) : rawBaseUrl
+
+const withAuthHeader = (headers = {}) => {
+  const token = localStorage.getItem('access_token')
+  return token ? { ...headers, Authorization: `Bearer ${token}` } : headers
+}
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -10,6 +16,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token')
   if (token) {
+    config.headers = config.headers || {}
     config.headers.Authorization = `Bearer ${token}`
   }
   return config
@@ -62,9 +69,11 @@ export const feedbackService = {
 
 export const userService = {
   startInterview: (interviewType, difficulty) => {
-    const token = localStorage.getItem('access_token')
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    return apiClient.post('/users/start-interview', { interview_type: interviewType, difficulty }, { headers })
+    return apiClient.post(
+      '/users/start-interview',
+      { interview_type: interviewType, difficulty },
+      { headers: withAuthHeader() }
+    )
   },
   
   endInterview: (interviewId) =>

@@ -113,9 +113,11 @@ SECRET_KEY=your-secret-key-change-this
 
 ### Frontend Configuration
 
-The frontend automatically connects to `http://localhost:8000/api`
+The frontend automatically connects to `http://localhost:8000/api` in development.
 
-To change, edit `frontend/vite.config.js`
+To change the API target, set `VITE_API_URL` for the frontend.
+
+If you serve the frontend from a different host or port, add that origin to `CORS_ORIGINS` in `backend/.env`.
 
 ## 🐛 Troubleshooting
 

@@ -1,12 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { FiLogOut, FiHome, FiBarChart2 } from 'react-icons/fi'
+import { useAuthStore } from '../store'
 
 export default function Layout({ children }) {
   const navigate = useNavigate()
+  const logout = useAuthStore((state) => state.logout)
   const isAuthenticated = !!localStorage.getItem('access_token')
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token')
+    logout()
     localStorage.removeItem('user_id')
     navigate('/login')
   }

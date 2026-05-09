@@ -27,6 +27,8 @@ export default function InterviewPage() {
   const mediaRecorderRef = useRef(null)
   const audioChunksRef = useRef([])
 
+  const currentQuestion = questions[currentQuestionIndex]
+
   useEffect(() => {
     if (questions.length === 0) {
       // If dev questions are present in localStorage, use them for testing.
@@ -47,17 +49,24 @@ export default function InterviewPage() {
     }
   }, [questions, navigate])
 
+  useEffect(() => {
+    if (!currentQuestion) {
+      return
+    }
+
+    setCurrentAnswer(answers[currentQuestion.id] || '')
+  }, [currentQuestion, answers])
+
   // Speak the question aloud and optionally auto-start recording
   useEffect(() => {
     if (questions.length === 0) return
-    const current = questions[currentQuestionIndex]
-    if (!current) return
+    if (!currentQuestion) return
 
     // Text-to-Speech
     try {
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel()
-        const utter = new SpeechSynthesisUtterance(current.text)
+        const utter = new SpeechSynthesisUtterance(currentQuestion.text)
         utter.lang = 'en-US'
         window.speechSynthesis.speak(utter)
       }
@@ -67,14 +76,21 @@ export default function InterviewPage() {
 
     // Removed auto-start recording to avoid unexpected permission prompts.
     // User must press the Record button to start recording now.
-    return () => {}
-  }, [currentQuestionIndex, questions])
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+      }
+    }
+  }, [currentQuestion, questions])
 
   if (questions.length === 0) {
     return <div className="text-center py-8">Loading...</div>
   }
 
-  const currentQuestion = questions[currentQuestionIndex]
+  if (!currentQuestion) {
+    return <div className="text-center py-8">Preparing your next question...</div>
+  }
+
   const hasAnswer = !!answers[currentQuestion?.id]
 
   const startRecording = async () => {
@@ -104,6 +120,7 @@ export default function InterviewPage() {
   const stopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop()
+      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop())
       setIsRecording(false)
     }
   }
@@ -162,8 +179,6 @@ export default function InterviewPage() {
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestion(currentQuestionIndex + 1)
-      const nextQuestion = questions[currentQuestionIndex + 1]
-      setCurrentAnswer(answers[nextQuestion.id] || '')
       setFeedback(null)
     }
   }

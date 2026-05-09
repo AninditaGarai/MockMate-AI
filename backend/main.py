@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 import os
 from dotenv import load_dotenv
 
@@ -18,12 +17,22 @@ app = FastAPI(
 )
 
 # CORS configuration
-origins = [
+default_origins = {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:8080",
-    os.getenv("FRONTEND_URL", "http://localhost:3000")
-]
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+}
+
+env_origins = {
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "").split(",")
+    if origin.strip()
+}
+
+frontend_origin = os.getenv("FRONTEND_URL", "http://localhost:3000").strip()
+origins = sorted(default_origins | env_origins | {frontend_origin})
 
 app.add_middleware(
     CORSMiddleware,

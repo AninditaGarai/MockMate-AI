@@ -208,9 +208,15 @@ FRONTEND_URL=http://localhost:3000
 
 ### Frontend Configuration
 
-The frontend is configured to proxy API calls to `http://localhost:8000/api`.
+The frontend proxies API calls to `http://localhost:8000/api` in development.
 
-Modify `frontend/vite.config.js` if your backend runs on a different URL.
+If you need to point the UI at a different backend, set `VITE_API_URL` in the frontend environment. For example:
+
+```env
+VITE_API_URL=http://localhost:8000/api
+```
+
+If the frontend is served from a different origin, add it to `CORS_ORIGINS` in `backend/.env` as a comma-separated list.
 
 ## 🏃 Running the Application
 
@@ -234,6 +240,8 @@ npm run dev
 ```
 
 The frontend will be available at `http://localhost:3000`
+
+If you run the frontend on a different port, update `FRONTEND_URL` and `CORS_ORIGINS` in `backend/.env` so the API accepts browser requests from that origin.
 
 ## 📚 API Documentation
 
