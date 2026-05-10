@@ -37,7 +37,7 @@ class UserResponse(BaseModel):
 @router.post("/register", response_model=UserResponse)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
     """Register a new user"""
-    # Check if user already exists
+    # Check if email already exists
     existing_user = db.query(models.User).filter(
         models.User.email == user.email
     ).first()
@@ -46,6 +46,17 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
+        )
+    
+    # Check if username already exists
+    existing_username = db.query(models.User).filter(
+        models.User.username == user.username
+    ).first()
+    
+    if existing_username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already taken"
         )
     
     # Create new user
