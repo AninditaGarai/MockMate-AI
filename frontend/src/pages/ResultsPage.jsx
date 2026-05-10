@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import { FiCopy, FiCheck } from 'react-icons/fi'
 import { feedbackService } from '../services/api'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
@@ -9,6 +10,7 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true)
   const [chartData, setChartData] = useState([])
   const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -38,6 +40,19 @@ export default function ResultsPage() {
     }
   }
 
+  const handleCopyScores = async () => {
+    const averageScores = {
+      confidence: feedback.length > 0 ? (feedback.reduce((sum, f) => sum + f.confidence_score, 0) / feedback.length).toFixed(2) : 0,
+      grammar: feedback.length > 0 ? (feedback.reduce((sum, f) => sum + f.grammar_score, 0) / feedback.length).toFixed(2) : 0,
+      technical: feedback.length > 0 ? (feedback.reduce((sum, f) => sum + f.technical_score, 0) / feedback.length).toFixed(2) : 0,
+      overall: feedback.length > 0 ? (feedback.reduce((sum, f) => sum + f.overall_score, 0) / feedback.length).toFixed(2) : 0,
+    }
+    const text = `MockMate AI Interview Results\n\nAverage Scores:\nConfidence: ${averageScores.confidence}\nGrammar: ${averageScores.grammar}\nTechnical: ${averageScores.technical}\nOverall: ${averageScores.overall}`
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   if (loading) {
     return <div className="text-center py-8">Loading results...</div>
   }
@@ -60,6 +75,24 @@ export default function ResultsPage() {
 
   return (
     <div className="space-y-8">
+      {/* Action Bar */}
+      <div className="flex justify-end">
+        <button
+          onClick={handleCopyScores}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold transition-colors"
+        >
+          {copied ? (
+            <>
+              <FiCheck size={18} /> Copied!
+            </>
+          ) : (
+            <>
+              <FiCopy size={18} /> Copy Scores
+            </>
+          )}
+        </button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid md:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-6 rounded-xl shadow-lg">
