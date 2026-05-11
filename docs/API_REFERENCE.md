@@ -45,7 +45,7 @@ Content-Type: application/json
   "full_name": "John Doe"
 }
 
-Response (201):
+Response (200):
 {
   "id": 1,
   "email": "user@example.com",
