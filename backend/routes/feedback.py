@@ -30,31 +30,28 @@ async def evaluate_answer(
 ):
     """Evaluate a user's answer and provide feedback"""
     try:
-        # Get the question and interview
         question = db.query(models.Question).filter(
             models.Question.id == request.question_id
         ).first()
-        
+
         if not question:
             raise HTTPException(status_code=404, detail="Question not found")
-        
-        # Evaluate using AI or ML model
+
         if request.use_ml_model:
             evaluator = MLEvaluator()
         else:
             evaluator = FeedbackEvaluator()
-        
+
         evaluation = evaluator.evaluate(
             question=question.text,
             answer=request.answer_text
         )
-        
-        # Save to database
+
         interview_question = db.query(models.InterviewQuestion).filter(
             models.InterviewQuestion.interview_id == request.interview_id,
             models.InterviewQuestion.question_id == request.question_id
         ).first()
-        
+
         if interview_question:
             interview_question.answer_text = request.answer_text
             interview_question.confidence_score = evaluation["confidence_score"]
@@ -63,11 +60,13 @@ async def evaluate_answer(
             interview_question.overall_score = evaluation["overall_score"]
             interview_question.feedback = evaluation["feedback"]
             db.commit()
-        
+
         return {
             **evaluation,
             "model_used": "ml_model" if request.use_ml_model else "openai"
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -79,6 +78,7 @@ async def evaluate_voice_answer(
     db: Session = Depends(get_db)
 ):
     """Evaluate a voice answer using speech-to-text and feedback evaluation"""
+    tmp_path = None
     try:
         from services.speech_to_text import transcribe_audio
         
@@ -98,6 +98,9 @@ async def evaluate_voice_answer(
         question = db.query(models.Question).filter(
             models.Question.id == question_id
         ).first()
+
+        if not question:
+            raise HTTPException(status_code=404, detail="Question not found")
         
         evaluator = FeedbackEvaluator()
         evaluation = evaluator.evaluate(
@@ -105,16 +108,18 @@ async def evaluate_voice_answer(
             answer=answer_text
         )
         
-        # Clean up
-        os.unlink(tmp_path)
-        
         return {
             **evaluation,
             "transcribed_text": answer_text,
             "model_used": "openai"
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
 
 @router.get("/history/{interview_id}")
 async def get_feedback_history(

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiPlay, FiMic, FiBarChart2, FiCpu, FiGlobe, FiSettings } from 'react-icons/fi'
+import { FiPlay, FiMic, FiBarChart2, FiCpu, FiGlobe, FiSettings, FiTrendingUp } from 'react-icons/fi'
 
 export default function HomePage() {
   const isAuthenticated = !!localStorage.getItem('access_token')
