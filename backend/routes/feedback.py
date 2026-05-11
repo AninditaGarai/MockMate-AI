@@ -6,6 +6,7 @@ import models
 from services.feedback_evaluator import FeedbackEvaluator
 from services.ml_evaluator import MLEvaluator
 from typing import Optional
+from datetime import datetime
 
 router = APIRouter()
 
@@ -107,6 +108,21 @@ async def evaluate_voice_answer(
             question=question.text,
             answer=answer_text
         )
+
+        interview_question = db.query(models.InterviewQuestion).filter(
+            models.InterviewQuestion.interview_id == interview_id,
+            models.InterviewQuestion.question_id == question_id
+        ).first()
+
+        if interview_question:
+            interview_question.answer_text = answer_text
+            interview_question.confidence_score = evaluation["confidence_score"]
+            interview_question.grammar_score = evaluation["grammar_score"]
+            interview_question.technical_score = evaluation["technical_score"]
+            interview_question.overall_score = evaluation["overall_score"]
+            interview_question.feedback = evaluation["feedback"]
+            interview_question.answered_at = datetime.utcnow()
+            db.commit()
         
         return {
             **evaluation,
