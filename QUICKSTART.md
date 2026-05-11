@@ -32,6 +32,10 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Copy environment template
+# PowerShell
+Copy-Item .env.example .env
+
+# macOS/Linux
 cp .env.example .env
 
 # Edit .env and add your OpenAI API key
