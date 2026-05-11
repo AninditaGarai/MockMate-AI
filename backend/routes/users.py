@@ -113,9 +113,10 @@ async def end_interview(
     # Calculate overall score
     questions = interview.questions
     if questions:
-        total_score = sum(q.overall_score for q in questions if q.overall_score)
-        average_score = total_score / len(questions)
-        interview.score = average_score
+        scored_questions = [q for q in questions if q.overall_score is not None]
+        if scored_questions:
+            total_score = sum(q.overall_score for q in scored_questions)
+            interview.score = total_score / len(scored_questions)
     
     interview.completed_at = datetime.utcnow()
     db.commit()
