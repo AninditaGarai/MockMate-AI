@@ -166,7 +166,7 @@ export default function DashboardPage() {
                     <td className="px-4 py-3">{interview.type}</td>
                     <td className="px-4 py-3 capitalize">{interview.difficulty}</td>
                     <td className="px-4 py-3">
-                      {interview.score ? (
+                      {interview.score !== null && interview.score !== undefined ? (
                         <span className="font-bold text-purple-600">{interview.score.toFixed(2)}%</span>
                       ) : (
                         <span className="text-gray-500">In Progress</span>
@@ -174,7 +174,7 @@ export default function DashboardPage() {
                     </td>
                     <td className="px-4 py-3">{new Date(interview.started_at).toLocaleDateString()}</td>
                     <td className="px-4 py-3">
-                      {interview.score && (
+                      {interview.score !== null && interview.score !== undefined && (
                         <button
                           onClick={() => navigate(`/results/${interview.id}`)}
                           className="text-purple-600 hover:text-purple-800 font-semibold"
