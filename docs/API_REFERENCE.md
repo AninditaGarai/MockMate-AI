@@ -68,7 +68,8 @@ Content-Type: application/json
 Response (200):
 {
   "access_token": "eyJhbGciOiJIUzI1NiIs...",
-  "token_type": "bearer"
+  "token_type": "bearer",
+  "user_id": 1
 }
 ```
 
