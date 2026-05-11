@@ -24,7 +24,7 @@ A full-stack web application designed to help users prepare for technical and no
 
 ### 🎤 Multi-Modal Input (Text + Voice)
 - Users can answer via typing or speaking
-- Voice input powered by browser speech recognition
+- Voice input recorded in the browser and transcribed on the backend
 - Enhances real interview simulation experience
 
 ### 📊 Intelligent Feedback System
