@@ -41,6 +41,10 @@ export default function ResultsPage() {
   }
 
   const handleCopyScores = async () => {
+    if (feedback.length === 0) {
+      return
+    }
+
     const averageScores = {
       confidence: feedback.length > 0 ? (feedback.reduce((sum, f) => sum + f.confidence_score, 0) / feedback.length).toFixed(2) : 0,
       grammar: feedback.length > 0 ? (feedback.reduce((sum, f) => sum + f.grammar_score, 0) / feedback.length).toFixed(2) : 0,
@@ -79,7 +83,8 @@ export default function ResultsPage() {
       <div className="flex justify-end">
         <button
           onClick={handleCopyScores}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold transition-colors"
+          disabled={feedback.length === 0}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {copied ? (
             <>
