@@ -158,6 +158,12 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
+On Windows PowerShell, use:
+```powershell
+python -m venv venv
+venv\Scripts\Activate.ps1
+```
+
 3. Install dependencies:
 ```bash
 pip install -r requirements.txt
@@ -166,6 +172,11 @@ pip install -r requirements.txt
 4. Create `.env` file from template:
 ```bash
 cp .env.example .env
+```
+
+On Windows PowerShell, use:
+```powershell
+Copy-Item .env.example .env
 ```
 
 5. Configure environment variables in `.env`
