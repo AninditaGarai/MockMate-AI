@@ -5,7 +5,8 @@ import { useAuthStore } from '../store'
 export default function Layout({ children }) {
   const navigate = useNavigate()
   const logout = useAuthStore((state) => state.logout)
-  const isAuthenticated = !!localStorage.getItem('access_token')
+  const token = useAuthStore((state) => state.token)
+  const isAuthenticated = !!token
 
   const handleLogout = () => {
     logout()
