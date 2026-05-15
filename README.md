@@ -364,3 +364,5 @@ For support, email support@mockmate.ai or open an issue on GitHub.
 ---
 
 **Made with ❤️ for interview preparation**
+
+Change: Minor README tweak — corrected wording and added commit note.
