@@ -241,6 +241,13 @@ python main.py
 The API will be available at `http://localhost:8000`
 API docs: `http://localhost:8000/docs`
 
+Quick health check (after starting the backend):
+
+```bash
+curl http://localhost:8000/health
+# Expected response: {"status":"healthy"}
+```
+
 ### Start Frontend
 
 In a new terminal:

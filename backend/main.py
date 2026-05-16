@@ -1,12 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import time
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-# Minor: small harmless update for commit history
+# Middleware: simple request logger for basic diagnostics
 
 # Import routers
 from routes import auth, questions, feedback, users, models
@@ -43,6 +44,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    elapsed_ms = (time.time() - start_time) * 1000
+    print(f"{request.method} {request.url.path} completed_in={elapsed_ms:.2f}ms status_code={response.status_code}")
+    return response
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
